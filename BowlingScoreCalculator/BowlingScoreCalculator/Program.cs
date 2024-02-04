@@ -16,61 +16,47 @@
              * Fonction aléatoire, pour simuler les lancées lors du débogage
              * */
 
-            //CreatePlayers();
-            //Console.ReadLine();
-            //Shot();
-
-            Play(CreatePlayers());
+            string[,] tableau = new string[5, 12];
+            int counter = 1;
+            Play(CreatePlayers(), counter, tableau);
 
             }
 
-        public static void ShowScore(string nameOfPlayer, int firstShot, int secondShot, int scoreOfPlayer)
+        public static string[,] ShowScore(string nameOfPlayer, int firstShot, int secondShot, int scoreOfPlayer, int counter, string[,] tableau)
         {
-            Console.Write("   ----------------------------------------------");
-            Console.Write("   |          Calculateur de Score de Bowling        |");
-            Console.Write("   ----------------------------------------------");
+            Console.WriteLine("   ----------------------------------------------");
+            Console.WriteLine("   |          Calculateur de Score de Bowling   |");
+            Console.WriteLine("   ----------------------------------------------");
 
-            Console.Write("\n   | Nom Joueur: " + nameOfPlayer);
-            Console.Write("   ----------------------------------------------");
+            Console.Write("   | Nom Joueur: " + nameOfPlayer);
+            Console.WriteLine("   ----------------------------------------------");
 
-            // En-têtes du tableau
-            Console.Write("\n   | Manche | 1 |  2   |  3   |  4   |  5   |  6   |  7   |  8   |  9   |  10  |");
-            Console.Write("\n   ----------------------------------------------");
+            tableau[0, 0] = "   | Manche    ";
+            tableau[1, 0] = "   |Lancer 1   ";
+            tableau[2, 0] = "   |Lancer 2   ";
+            tableau[3, 0] = "   |Total      ";
 
-            // Scores pour le premier lancer
-            Console.Write("\n   |Lancer 1|");
+            tableau[1, counter] = $"|   {firstShot}   ";
+            tableau[2, counter] = $"|   {secondShot}   ";
+            tableau[3, counter] = $"|   {scoreOfPlayer}   ";
 
-            for (int i = 0; i < 10; i++)
+            for (int frame = 1; frame <= 10; frame++)
             {
-                Console.Write("   |   ");
+                tableau[0, frame] = $"|   {frame}   ";
             }
 
-            Console.Write("    |");
-            Console.Write("\n   ----------------------------------------------");
-
-            // Scores pour le deuxième lancer
-            Console.Write("\n   |Lancer 2|");
-
-            for (int i = 0; i < 10; i++)
+            for (int row = 0; row < 4; row++)
             {
-                Console.Write("   |   ");
+                for (int frame = 0; frame < 11; frame++)
+                {
+                    Console.Write(tableau[row, frame]);
+                }
+                Console.WriteLine();
+                Console.WriteLine("   ----------------------------------------------");
             }
-
-            Console.Write("    |");
-            Console.Write("\n   ----------------------------------------------");
-
-            // Total
-            Console.Write("\n   |Total   |");
-
-            for (int i = 0; i < 10; i++)
-            {
-                Console.Write("   |   ");
-            }
-
-            Console.Write("    |");
-            Console.Write("\n   ----------------------------------------------");
 
             Console.ReadLine();
+            return tableau;
         }
     
 
@@ -107,10 +93,14 @@
             return false;
         }
 
-        public static int Shot()
+        public static int Shot( int previousShot = 0)
         {
             Random random = new Random();
-            int shot = random.Next(0, 10);
+            int shot = 0;
+            if (previousShot != 0)
+                shot = random.Next(0, 11 - previousShot);
+            else 
+                shot = random.Next(0, 11);
             if (shot == 1)
                 Console.WriteLine("Une seule quille est tombée"); 
             else if(shot ==0)
@@ -143,22 +133,30 @@
             return score;
         }
 
-        public static void Play(Dictionary<string, int> listOfPlayers)
+        public static void Play(Dictionary<string, int> listOfPlayers, int counter, string[,] tableau)
         {
             string nameOfPlayer;
             int firstShot;
             int secondShot;
             int scoreOfPlayer;
-            foreach (string key in listOfPlayers.Keys)
+            while(counter <= 10)
             {
-                nameOfPlayer = key;
-                firstShot = Shot();
-                secondShot = Shot();
-                scoreOfPlayer = CalculateScore(firstShot, secondShot, listOfPlayers, nameOfPlayer);
+                foreach (string key in listOfPlayers.Keys)
+                {  
+                    nameOfPlayer = key;
+                    firstShot = Shot();
+                    secondShot = Shot(firstShot);
+                    scoreOfPlayer = CalculateScore(firstShot, secondShot, listOfPlayers, nameOfPlayer);
 
-                Console.WriteLine("Le joueur " + nameOfPlayer + " a le score : " + scoreOfPlayer);
-                ShowScore(nameOfPlayer, firstShot, secondShot, scoreOfPlayer);
+                    Console.WriteLine("Le joueur " + nameOfPlayer + " a le score : " + scoreOfPlayer);
+                    tableau = ShowScore(nameOfPlayer, firstShot, secondShot, scoreOfPlayer, counter, tableau);
+
+                }
+                counter++;
+                Console.Clear();
+
             }
+            
         }
 
         }
